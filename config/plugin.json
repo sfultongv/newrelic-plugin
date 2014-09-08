@@ -1,0 +1,8 @@
+{
+	"agents": [
+	{
+		"name" : "Author",
+		"pidfile" : "/cq/author/crx-quickstart/conf/cq.pid"
+	}
+	]
+}
