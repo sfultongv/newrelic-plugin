@@ -9,8 +9,10 @@ import java.util.Map;
 import com.newrelic.metrics.publish.Agent;
 import com.newrelic.metrics.publish.AgentFactory;
 import com.newrelic.metrics.publish.configuration.ConfigurationException;
+import com.newrelic.metrics.publish.util.Logger;
 
 public class JVMAgentFactory extends AgentFactory {
+	private static final Logger LOG = Logger.getLogger(JVMAgentFactory.class);
 	private static final String JMAP = "/usr/java/default/bin/jmap";
 
 	private final Runtime runtime;
@@ -32,6 +34,7 @@ public class JVMAgentFactory extends AgentFactory {
 		try {
 			String pid = getPID(pidfile);
 			String[] args = { JMAP, "-heap", pid};
+			LOG.info("Will attach to java process " + pid);
 			return new JVMAgent(name, runtime, args);
 		} catch (IOException e) {
 			throw new ConfigurationException("could not read pid for java process");
