@@ -1,9 +1,5 @@
 package com.velir.newrelic.plugin;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Map;
 
 import com.newrelic.metrics.publish.Agent;
@@ -13,7 +9,6 @@ import com.newrelic.metrics.publish.util.Logger;
 
 public class JVMAgentFactory extends AgentFactory {
 	private static final Logger LOG = Logger.getLogger(JVMAgentFactory.class);
-	private static final String JMAP = "/usr/java/default/bin/jmap";
 
 	private final Runtime runtime;
 
@@ -26,27 +21,12 @@ public class JVMAgentFactory extends AgentFactory {
 	public Agent createConfiguredAgent(final Map<String, Object> properties) throws ConfigurationException {
 		String name = (String) properties.get("name");
 		String pidfile = (String) properties.get("pidfile");
+		String jmap = (String) properties.get("jmap");
 
 		if (name == null || pidfile == null) {
 			throw new ConfigurationException("'name' and 'pidfile' cannot be null. Do you have a 'config/plugin.json' file?");
 		}
 
-		try {
-			String pid = getPID(pidfile);
-			String[] args = { JMAP, "-heap", pid};
-			LOG.info("Will attach to java process " + pid);
-			return new JVMAgent(name, runtime, args);
-		} catch (IOException e) {
-			throw new ConfigurationException("could not read pid for java process");
-		}
-
+		return new JVMAgent(name, runtime, pidfile, jmap);
 	}
-
-	private String getPID (String pidfile) throws IOException {
-		FileInputStream fileInputStream = new FileInputStream(pidfile);
-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
-		return bufferedReader.readLine();
-
-	}
-
 }
